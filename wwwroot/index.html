@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teach Your Assistant</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script>
+        async function uploadFile() {
+            let fileInput = document.getElementById('fileInput');
+            let formData = new FormData();
+            formData.append('file', fileInput.files[0]);
+
+            let responseText = 'processing...';
+            document.getElementById('output').innerText = responseText;
+
+            let response = await fetch('/api/generate_prompt', {
+                method: 'POST',
+                body: formData
+            });
+
+            let result = await response.text();
+            document.getElementById('output').innerText = '';
+            document.getElementById('prompt').value = result;
+            document.getElementById('promptContainer').style.display = 'block';
+        }
+
+        async function callApi() {
+            let phoneNumber = document.getElementById('phoneNumber').value;
+            let promptText = document.getElementById('prompt').value;
+
+            let response = await fetch('/api/call', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ phoneNumber: phoneNumber, prompt: promptText })
+            });
+            
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #2B456E;
+        }
+        h1 {
+            background-color: #22385B;
+            color: #FFF;
+            line-height: 40px;
+            padding: 0 16px;
+            font-weight: bold;
+        }
+        h2 {
+            color: #FFF;
+            font-weight: bold;
+            font-size: 1.2rem;
+        }
+        p {
+            color: #FFF;
+            margin-bottom: 20px;
+        }
+
+        .step {
+            border-bottom: solid 1px #556A8B;
+            padding: 30px 0;
+            max-width: 700px;
+        }
+
+        .step-3 {
+            border: none;
+        }
+
+        .input-group {
+            background-color: #FFF;
+            padding: 4px;
+            border-radius: 6px;
+        }
+
+        input[type=text] {
+            border-radius: 3px;
+            padding: 10px 16px;
+            width: 80%;
+        }
+
+        input[type=file] {
+            border-radius: 3px;
+            padding: 7px 8px;
+            width: 80%;
+        }
+
+        button {
+            background-color: #824AFB;
+            color: #FFF;
+            font-weight: bold;
+            border-radius: 3px;
+            padding: 10px 18px;
+            float: right;
+        }
+
+        button:disabled,
+        button[disabled] {
+            opacity: .5;
+        }
+
+        textarea {
+            border-radius: 6px;
+            width: 100%;
+            padding: 10px 16px;
+        }
+
+    </style>
+
+</head>
+<body>
+    <h1>Form Assistant</h1>
+
+    <div class="container mx-auto p-10">
+        <div class="step step-1">
+            <h2>Teach your assistant</h2>
+            <p>Upload or provide a URL to a file that your assistant can learn from, like an intake form.</p>
+            <div class="input-group">
+                <input type="file" id="fileInput">
+                <button onclick="uploadFile()">Analyze</button>
+            </div>
+            <div id="output"></div>
+        </div>
+
+        <div id="promptContainer" class="step step-2">
+            <h2>Define your assistant's behavior</h2>
+            <p>Modify the prompt below to customize how your assistant should respond.</p>
+            <textarea id="prompt" rows="5"></textarea>
+        </div>
+
+        <div class="step step-3">
+            <h2>Try it out</h2>
+            <p>Modify the prompt below to customize how your assistant should respond.</p>
+            <div class="input-group">
+                <input type="text" id="phoneNumber" placeholder="Enter your phone number">
+                <button onclick="callApi()">Call Me</button>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+
